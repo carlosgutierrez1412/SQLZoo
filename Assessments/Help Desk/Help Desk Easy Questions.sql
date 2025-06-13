@@ -21,3 +21,28 @@ COUNT(*) AS volume
 FROM Issue
 GROUP BY status
 
+-- 4. Calls are not normally assigned to a manager but it does happen. How many calls have been assigned to staff who are at Manager Level?
+WITH level_cte AS (
+    SELECT level_code
+    FROM Level
+    WHERE Manager = 'Y'
+),
+manager_cte AS (
+    SELECT staff_code
+    FROM Staff
+    WHERE level_code IN (SELECT level_code FROM level_cte)
+)
+
+SELECT COUNT(*) AS mlcc
+FROM manager_cte st
+JOIN Issue i
+  ON st.staff_code = i.assigned_to
+
+-- 5. Show the manager for each shift. Your output should include the shift date and type; also the first and last name of the manager.
+SELECT Shift_date, Shift_type, first_name, last_name
+FROM Shift sh
+JOIN Staff st
+ON sh.manager = st.staff_code
+ORDER BY Shift_date 
+
+
